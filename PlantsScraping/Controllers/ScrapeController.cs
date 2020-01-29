@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using HtmlAgilityPack; 
+using HtmlAgilityPack;
+using System.IO; 
 
 namespace PlantsScraping.Controllers
 {
@@ -64,9 +65,37 @@ namespace PlantsScraping.Controllers
                 categories["Description"] = "";
                 string bad_line = "Thanks to Wikipedia for text and information";
                 string html = category_paragraph.InnerHtml;
+
                 string[] paragraphs = html.Split(new string[] { "<br>" }, StringSplitOptions.RemoveEmptyEntries); 
                 return categories; 
             }
+
+
+            //public static Dictionary<string,object>[]DumpyDictionaries()
+            //{
+            //    int n = 3;
+            //    string[] columns = { "Name", "Description", "Other Things" };
+            //    string[] links =
+            //    {
+            //        "http://www.terrain.net.nz/friends-of-te-henui-group/plants-native-botanical-names-r-to-z/wahlenbergia-albomarginata-subsp-laxa-new-zealand-harebell.html",
+            //        "http://www.terrain.net.nz/friends-of-te-henui-group/plants-native-botanical-names-r-to-z/wahlenbergia-matthewsii-rock-harebell.html",
+            //        "http://www.terrain.net.nz/friends-of-te-henui-group/plants-native-botanical-names-r-to-z/wahlenbergia-pygmaea-subsp-pygmaea-north-island-harebell.html",
+            //        "http://www.terrain.net.nz/friends-of-te-henui-group/plants-native-botanical-names-r-to-z/wahlenbergia-violacea-rimu-roa.html",
+            //         "http://www.terrain.net.nz/friends-of-te-henui-group/plants-native-botanical-names-r-to-z/poor-knights-lily-xeronema-callistemon.html"
+            //    };
+            //    Dictionary<string, object>[] dumpy = new Dictionary<string, object>[n];
+            //    for (int i = 0; i < n; i++)
+            //    {
+            //        Dictionary<string, object> key_values = new Dictionary<string, object>(); 
+            //        foreach (string column in columns)
+            //        {
+            //            key_values[column] = Path.GetRandomFileName(); 
+            //        }
+            //        key_values["Image Links"] = links;
+            //        dumpy[i] = key_values; 
+            //    }
+            //    return dumpy; 
+            //}
         }
     }
 }
