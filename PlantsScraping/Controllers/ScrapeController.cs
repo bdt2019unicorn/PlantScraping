@@ -4,7 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using HtmlAgilityPack;
-using System.IO; 
+using System.IO;
+using System.Runtime.Serialization; 
 
 namespace PlantsScraping.Controllers
 {
@@ -19,8 +20,12 @@ namespace PlantsScraping.Controllers
         [HttpPost]
         public string ScrapeAction(string[]links)
         {
-            string url = links[0];
-            Dictionary<string, object> plant_information = Support.TableRowValues(url); 
+            Dictionary<string, object>[] table_values = new Dictionary<string, object>[links.Length];
+            for (int i = 0; i < links.Length; i++)
+            {
+                Dictionary<string, object> plant_information = Support.TableRowValues(links[i]);
+                table_values[i] = plant_information;
+            }
 
             return "receive"; 
         }
@@ -37,16 +42,55 @@ namespace PlantsScraping.Controllers
                 HtmlNodeCollection paragraph_div = main_html.SelectNodes("p|div"); 
 
                 Dictionary<string, object> categories = Categories(paragraph_div[0]);
-                categories["Description"] += DescriptionText(paragraph_div); 
+                categories["Description"] += DescriptionText(paragraph_div);
+                categories["Image Links"] = ImageLinks(main_html);
 
-                return categories; 
+                key_values = key_values.Concat(categories).ToDictionary(x => x.Key, x => x.Value);
+
+                return key_values; 
+            }
+
+            private static string[]ImageLinks(HtmlNode main_html)
+            {
+                List<string> all_links = new List<string>();
+                string bad_img_src = "/images/template/donate.png";
+                Uri base_uri = new Uri("http://www.terrain.net.nz/"); 
+                HtmlNodeCollection images = main_html.SelectNodes("//img");
+                foreach (HtmlNode img in images)
+                {
+                    string src = img.GetAttributeValue("src", bad_img_src);
+                    if (!(src.IndexOf(bad_img_src) >= 0))
+                    {
+                        if (MainHtml(src, true) == null)
+                        {
+                            Uri uri = new Uri(base_uri, src);
+                            src = uri.AbsoluteUri;
+                        }
+                        all_links.Add(src);
+                    }
+
+                }
+
+                return all_links.ToArray(); 
             }
 
 
-            private static HtmlNode MainHtml(string url)
+            private static HtmlNode MainHtml(string url, bool test_only=false)
             {
-                var web = new HtmlWeb();
-                HtmlDocument doc = web.Load(url);
+                HtmlDocument doc = null; 
+                try
+                {
+                    var web = new HtmlWeb();
+                    doc = web.Load(url);
+                }
+                catch
+                {
+                    return null; 
+                }
+                if(test_only)
+                {
+                    return CategoriesDiv("<h1>Good</h1>");
+                }
                 HtmlNode main_html = doc.GetElementbyId("main");
                 HtmlNodeCollection bad_nodes = main_html.SelectNodes("div[contains(@class, 'hr')]|div[contains(@class, 'right49')]|div[contains(@class, 'left49')]|hr[contains(@class, 'accessibility')]");
 
@@ -68,13 +112,20 @@ namespace PlantsScraping.Controllers
                 string[] paragraphs = html.Split(new string[] { "<br>" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string paragraph in paragraphs)
                 {
+                    int first_strong = paragraph.IndexOf("<strong>"); 
+                    if(first_strong>=0)
+                    {
+
+                    }
+
+
                     HtmlNode div = CategoriesDiv(paragraph);
                     try
                     {
-                        HtmlNode strong = div.SelectSingleNode("strong");
-                        string category = strong.InnerText;
+                        HtmlNodeCollection strong = div.SelectNodes("//strong");
+                        string category = strong[0].InnerText;
                         category = category.Substring(0, category.IndexOf(":"));
-                        strong.ParentNode.RemoveChild(strong);
+                        strong[0].ParentNode.RemoveChild(strong[0]);
                         categories[category] = div.InnerText; 
                     }
                     catch 
@@ -103,7 +154,11 @@ namespace PlantsScraping.Controllers
                 {
                     description += paragraph_div[i].InnerText.Trim() + "\n"; 
                 }
-                description = description.Substring(0, description.IndexOf(bad_line));
+                try
+                {
+                    description = description.Substring(0, description.IndexOf(bad_line));
+                }
+                catch { }
                 description = description.Trim();
                 return description; 
             }
