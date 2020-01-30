@@ -5,7 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using HtmlAgilityPack;
 using System.IO;
-using System.Runtime.Serialization; 
+using System.Runtime.Serialization;
+using Newtonsoft.Json; 
 
 namespace PlantsScraping.Controllers
 {
@@ -27,7 +28,9 @@ namespace PlantsScraping.Controllers
                 table_values[i] = plant_information;
             }
 
-            return "receive"; 
+            string json = JsonConvert.SerializeObject(table_values); 
+
+            return json; 
         }
 
 
@@ -42,7 +45,7 @@ namespace PlantsScraping.Controllers
                 HtmlNodeCollection paragraph_div = main_html.SelectNodes("p|div"); 
 
                 Dictionary<string, object> categories = Categories(paragraph_div[0]);
-                categories["Description"] += DescriptionText(paragraph_div);
+                categories["Description"] = DescriptionText(paragraph_div,(string)categories["Description"]);
                 categories["Image Links"] = ImageLinks(main_html);
 
                 key_values = key_values.Concat(categories).ToDictionary(x => x.Key, x => x.Value);
@@ -112,29 +115,50 @@ namespace PlantsScraping.Controllers
                 string[] paragraphs = html.Split(new string[] { "<br>" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string paragraph in paragraphs)
                 {
+                    HtmlNode div = CategoriesDiv(paragraph);
                     int first_strong = paragraph.IndexOf("<strong>"); 
                     if(first_strong>=0)
                     {
-
+                        string name = StrongInnerText(first_strong, paragraph); 
+                        try
+                        {
+                            name = name.Substring(0, name.IndexOf(":")); 
+                        }
+                        catch { }
+                        string inner_text = div.InnerText;
+                        inner_text = inner_text.Replace(name + ":", String.Empty);
+                        categories[name] = inner_text; 
                     }
-
-
-                    HtmlNode div = CategoriesDiv(paragraph);
-                    try
+                    else
                     {
-                        HtmlNodeCollection strong = div.SelectNodes("//strong");
-                        string category = strong[0].InnerText;
-                        category = category.Substring(0, category.IndexOf(":"));
-                        strong[0].ParentNode.RemoveChild(strong[0]);
-                        categories[category] = div.InnerText; 
+                        categories["Description"] += div.InnerText.Trim() + "\n";
                     }
-                    catch 
-                    {
-                        categories["Description"] +=div.InnerText.Trim()+"\n"; 
-                    }
+
+
+                    
+                    //try
+                    //{
+                    //    HtmlNodeCollection strong = div.SelectNodes("//strong");
+                    //    string category = strong[0].InnerText;
+                    //    category = category.Substring(0, category.IndexOf(":"));
+                    //    strong[0].ParentNode.RemoveChild(strong[0]);
+                    //    categories[category] = div.InnerText; 
+                    //}
+                    //catch 
+                    //{
+                    //    categories["Description"] +=div.InnerText.Trim()+"\n"; 
+                    //}
                 }
                 categories["Description"] = ((string)categories["Description"]).Trim(); 
                 return categories; 
+            }
+
+            private static string StrongInnerText(int first, string html)
+            {
+                int strong_length = "<strong>".Length;
+                int last = html.IndexOf("</strong>");
+                first += strong_length;
+                return html.Substring(first, last - first); 
             }
 
             private static HtmlNode CategoriesDiv(string html)
@@ -146,19 +170,14 @@ namespace PlantsScraping.Controllers
             }
 
 
-            private static string DescriptionText(HtmlNodeCollection paragraph_div)
+            private static string DescriptionText(HtmlNodeCollection paragraph_div, string description)
             {
-                string description = "";
                 string bad_line = "Thanks to Wikipedia for text and information";
                 for (int i = 1; i < paragraph_div.Count; i++)
                 {
                     description += paragraph_div[i].InnerText.Trim() + "\n"; 
                 }
-                try
-                {
-                    description = description.Substring(0, description.IndexOf(bad_line));
-                }
-                catch { }
+                description = description.Substring(0, description.IndexOf(bad_line)); 
                 description = description.Trim();
                 return description; 
             }
