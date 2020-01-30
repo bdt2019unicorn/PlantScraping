@@ -28,9 +28,10 @@ namespace PlantsScraping.Controllers
                 table_values[i] = plant_information;
             }
 
-            string json = JsonConvert.SerializeObject(table_values); 
+            string json = JsonConvert.SerializeObject(table_values);
+            string directory = AppDomain.CurrentDomain.BaseDirectory; 
 
-            return json; 
+            return directory; 
         }
 
 
@@ -177,7 +178,11 @@ namespace PlantsScraping.Controllers
                 {
                     description += paragraph_div[i].InnerText.Trim() + "\n"; 
                 }
-                description = description.Substring(0, description.IndexOf(bad_line)); 
+                try
+                {
+                    description = description.Substring(0, description.IndexOf(bad_line));
+                }
+                catch { }
                 description = description.Trim();
                 return description; 
             }
