@@ -241,3 +241,12 @@ C:\Users\laksh\Documents\GitHub\PlantScraping\PlantsScraping\obj\Debug\PlantsScr
 C:\Users\laksh\Documents\GitHub\PlantScraping\PlantsScraping\obj\Debug\PlantsScraping.csproj.CopyComplete
 C:\Users\laksh\Documents\GitHub\PlantScraping\PlantsScraping\obj\Debug\PlantsScraping.dll
 C:\Users\laksh\Documents\GitHub\PlantScraping\PlantsScraping\obj\Debug\PlantsScraping.pdb
+C:\Users\OEM\Desktop\PlantsScraping\PlantScraping\PlantsScraping\bin\ClosedXML.dll
+C:\Users\OEM\Desktop\PlantsScraping\PlantScraping\PlantsScraping\bin\DocumentFormat.OpenXml.dll
+C:\Users\OEM\Desktop\PlantsScraping\PlantScraping\PlantsScraping\bin\ExcelNumberFormat.dll
+C:\Users\OEM\Desktop\PlantsScraping\PlantScraping\PlantsScraping\bin\FastMember.dll
+C:\Users\OEM\Desktop\PlantsScraping\PlantScraping\PlantsScraping\bin\System.IO.Packaging.dll
+C:\Users\OEM\Desktop\PlantsScraping\PlantScraping\PlantsScraping\bin\ClosedXML.pdb
+C:\Users\OEM\Desktop\PlantsScraping\PlantScraping\PlantsScraping\bin\ClosedXML.xml
+C:\Users\OEM\Desktop\PlantsScraping\PlantScraping\PlantsScraping\bin\DocumentFormat.OpenXml.xml
+C:\Users\OEM\Desktop\PlantsScraping\PlantScraping\PlantsScraping\bin\ExcelNumberFormat.xml
