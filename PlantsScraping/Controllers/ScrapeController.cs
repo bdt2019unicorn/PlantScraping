@@ -45,54 +45,25 @@ namespace PlantsScraping.Controllers
                 dictArray[i] = plant_information;
             }
 
-            //string json = JsonConvert.SerializeObject(dictArray);
-            string directory = AppDomain.CurrentDomain.BaseDirectory;
-            //myFunction(dictArray);
-            //String cnames = "";
-            //foreach (String c in columnNames)
-            //{
-            //    cnames += c + "\n";
-            //}
-
-            //return cnames;
-            ExportToExcel(excel_data_table); 
-            return directory;
+            return ExportToExcel(excel_data_table); 
         }
 
-        public static void ExportToExcel(DataTable table)
+        [HttpGet]
+        public ActionResult DownloadExcel(string file_name)
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, file_name);
+            byte[] fileByteArray = System.IO.File.ReadAllBytes(path);
+            System.IO.File.Delete(path);
+            return File(fileByteArray, "application/vnd.ms-excel", file_name);
+        }
+        public static string ExportToExcel(DataTable table)
         {
             XLWorkbook wb = new XLWorkbook();
             wb.Worksheets.Add(table, "plants");
-            wb.SaveAs("C:\\Users\\OEM\\Desktop\\plants.xlsx");
+            string file_name = "plants.xlsx"; 
+            wb.SaveAs(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, file_name));
+            return file_name; 
         }
-
-
-
-
-        //public static List<String> columnNames = new List<string>();
-        //public static void columnNamesGenerator(Dictionary<string, object> dict)
-        //{
-
-        //    foreach (KeyValuePair<string, object> entry in dict)
-        //    {
-        //        String key = entry.Key;
-        //        if (!columnNames.Contains(key))
-        //        {
-        //            columnNames.Add(key);
-        //        }
-
-        //    }
-
-
-
-        //}
-        //public static void myFunction(Dictionary<string, object>[] dictArray)
-        //{
-        //    foreach (Dictionary<string, object> dict in dictArray)
-        //    {
-        //        columnNamesGenerator(dict);
-        //    }
-        //}
 
         public static class Support
         {
@@ -193,21 +164,6 @@ namespace PlantsScraping.Controllers
                     {
                         categories["Description"] += div.InnerText.Trim() + "\n";
                     }
-
-
-
-                    //try
-                    //{
-                    //    HtmlNodeCollection strong = div.SelectNodes("//strong");
-                    //    string category = strong[0].InnerText;
-                    //    category = category.Substring(0, category.IndexOf(":"));
-                    //    strong[0].ParentNode.RemoveChild(strong[0]);
-                    //    categories[category] = div.InnerText; 
-                    //}
-                    //catch 
-                    //{
-                    //    categories["Description"] +=div.InnerText.Trim()+"\n"; 
-                    //}
                 }
                 categories["Description"] = ((string)categories["Description"]).Trim();
                 return categories;
@@ -261,8 +217,6 @@ namespace PlantsScraping.Controllers
                 div.InnerHtml = html;
                 return div;
             }
-
-
             private static string DescriptionText(HtmlNodeCollection paragraph_div, string description)
             {
                 string bad_line = "Thanks to Wikipedia for text and information";
@@ -279,32 +233,6 @@ namespace PlantsScraping.Controllers
                 return description;
             }
 
-
-            //public static Dictionary<string,object>[]DumpyDictionaries()
-            //{
-            //    int n = 3;
-            //    string[] columns = { "Name", "Description", "Other Things" };
-            //    string[] links =
-            //    {
-            //        "http://www.terrain.net.nz/friends-of-te-henui-group/plants-native-botanical-names-r-to-z/wahlenbergia-albomarginata-subsp-laxa-new-zealand-harebell.html",
-            //        "http://www.terrain.net.nz/friends-of-te-henui-group/plants-native-botanical-names-r-to-z/wahlenbergia-matthewsii-rock-harebell.html",
-            //        "http://www.terrain.net.nz/friends-of-te-henui-group/plants-native-botanical-names-r-to-z/wahlenbergia-pygmaea-subsp-pygmaea-north-island-harebell.html",
-            //        "http://www.terrain.net.nz/friends-of-te-henui-group/plants-native-botanical-names-r-to-z/wahlenbergia-violacea-rimu-roa.html",
-            //         "http://www.terrain.net.nz/friends-of-te-henui-group/plants-native-botanical-names-r-to-z/poor-knights-lily-xeronema-callistemon.html"
-            //    };
-            //    Dictionary<string, object>[] dumpy = new Dictionary<string, object>[n];
-            //    for (int i = 0; i < n; i++)
-            //    {
-            //        Dictionary<string, object> key_values = new Dictionary<string, object>(); 
-            //        foreach (string column in columns)
-            //        {
-            //            key_values[column] = Path.GetRandomFileName(); 
-            //        }
-            //        key_values["Image Links"] = links;
-            //        dumpy[i] = key_values; 
-            //    }
-            //    return dumpy; 
-            //}
         }
     }
 }
