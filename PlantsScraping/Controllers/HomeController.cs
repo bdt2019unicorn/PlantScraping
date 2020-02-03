@@ -10,7 +10,7 @@ namespace PlantsScraping.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Scrape"); 
         }
 
         public ActionResult About()
